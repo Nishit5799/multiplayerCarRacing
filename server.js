@@ -15,7 +15,7 @@ app.prepare().then(() => {
 
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: "*", // Allow all origins (update this in production)
     },
   });
 
