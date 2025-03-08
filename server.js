@@ -8,59 +8,64 @@ const handle = app.getRequestHandler();
 
 const PORT = process.env.PORT || 3000;
 
-app.prepare().then(() => {
-  const server = http.createServer((req, res) => {
-    handle(req, res);
-  });
-
-  const io = new Server(server, {
-    cors: {
-      origin: "*", // Allow all origins (update this in production)
-    },
-  });
-
-  let players = [];
-
-  io.on("connection", (socket) => {
-    console.log("a user connected:", socket.id);
-
-    socket.on("joinRoom", (playerName) => {
-      console.log("Received joinRoom event from:", playerName);
-      players.push({ id: socket.id, name: playerName, isReady: false });
-      io.emit("updatePlayers", players);
+app
+  .prepare()
+  .then(() => {
+    const server = http.createServer((req, res) => {
+      handle(req, res);
     });
 
-    socket.on("playerReady", (playerName) => {
-      console.log("Received playerReady event from:", playerName);
-      const player = players.find((p) => p.name === playerName);
-      if (player) {
-        player.isReady = true;
+    const io = new Server(server, {
+      cors: {
+        origin: "*", // Allow all origins (update this in production)
+      },
+    });
+
+    let players = [];
+
+    io.on("connection", (socket) => {
+      console.log("a user connected:", socket.id);
+
+      socket.on("joinRoom", (playerName) => {
+        console.log("Received joinRoom event from:", playerName);
+        players.push({ id: socket.id, name: playerName, isReady: false });
         io.emit("updatePlayers", players);
+      });
 
-        if (players.every((p) => p.isReady)) {
-          io.emit("startGame");
+      socket.on("playerReady", (playerName) => {
+        console.log("Received playerReady event from:", playerName);
+        const player = players.find((p) => p.name === playerName);
+        if (player) {
+          player.isReady = true;
+          io.emit("updatePlayers", players);
+
+          if (players.every((p) => p.isReady)) {
+            io.emit("startGame");
+          }
         }
-      }
+      });
+
+      socket.on("carMove", (data) => {
+        socket.broadcast.emit("carMove", data);
+      });
+
+      socket.on("restartGame", () => {
+        players = [];
+        io.emit("resetGame");
+      });
+
+      socket.on("disconnect", () => {
+        console.log("a user disconnected:", socket.id);
+        players = players.filter((player) => player.id !== socket.id);
+        io.emit("updatePlayers", players);
+      });
     });
 
-    socket.on("carMove", (data) => {
-      socket.broadcast.emit("carMove", data);
+    server.listen(PORT, (err) => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${PORT}`);
     });
-
-    socket.on("restartGame", () => {
-      players = [];
-      io.emit("resetGame");
-    });
-
-    socket.on("disconnect", () => {
-      console.log("a user disconnected:", socket.id);
-      players = players.filter((player) => player.id !== socket.id);
-      io.emit("updatePlayers", players);
-    });
+  })
+  .catch((err) => {
+    console.error("Error preparing Next.js app:", err);
   });
-
-  server.listen(PORT, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${PORT}`);
-  });
-});
