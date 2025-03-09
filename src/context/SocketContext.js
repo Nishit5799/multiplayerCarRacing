@@ -11,9 +11,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const newSocket = io(
-      process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3000"
-    );
+    const newSocket = io("http://localhost:3000"); // Replace with your server URL
     setSocket(newSocket);
 
     return () => newSocket.close();

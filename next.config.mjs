@@ -1,8 +1,4 @@
-const nextConfig = {
-  reactStrictMode: true,
-  env: {
-    NEXT_PUBLIC_SOCKET_SERVER_URL: process.env.NEXT_PUBLIC_SOCKET_SERVER_URL,
-  },
-};
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
 
 export default nextConfig;
