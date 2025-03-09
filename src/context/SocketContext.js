@@ -12,9 +12,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     // Use the NEXT_PUBLIC_SERVER_URL environment variable
-    const newSocket = io(
-      process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
-    );
+    const newSocket = io(process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000");
     setSocket(newSocket);
 
     return () => newSocket.close();
