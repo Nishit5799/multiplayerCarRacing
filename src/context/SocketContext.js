@@ -1,4 +1,3 @@
-// src/context/SocketContext.js
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
@@ -11,6 +10,7 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
+    // Use the NEXT_PUBLIC_SERVER_URL environment variable
     const newSocket = io(
       process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
     );
