@@ -11,10 +11,8 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    // Use the environment variable for the server URL
     const newSocket = io(
-      process.env.NEXT_PUBLIC_SOCKET_URL ||
-        "https://multiplayer-car-racing.vercel.app/"
+      process.env.NEXT_PUBLIC_SERVER_URL || "http://localhost:3000"
     );
     setSocket(newSocket);
 

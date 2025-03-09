@@ -2,10 +2,10 @@
   "name": "my3dcargame",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "dev": "node server.js", 
-    "build": "next build",    
-    "start": "node server.js" 
+"scripts": {
+    "dev": "node server.js",
+    "build": "next build",
+    "start": "node server.js"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
