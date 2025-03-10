@@ -1,4 +1,3 @@
-// src/context/SocketContext.js
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
@@ -12,7 +11,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     const newSocket = io(
-      process.env.NEXT_PUBLIC_SOCKET_SERVER_URL || "http://localhost:3000"
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3000"
     );
     setSocket(newSocket);
 
