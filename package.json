@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
-    "start": "node server.js"
+    "start": "node server.js",
+    "render-build": "npm run build"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

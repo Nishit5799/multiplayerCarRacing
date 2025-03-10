@@ -46,7 +46,7 @@ const keyboardMap = [
 ];
 
 const Experience = () => {
-  const socket = useSocket(); // This will use the URL from SocketContext
+  const socket = useSocket();
   const shadowCameraRef = useRef();
   const [joystickInput, setJoystickInput] = useState({ x: 0, y: 0 });
   const [bestTime, setBestTime] = useState(0);
