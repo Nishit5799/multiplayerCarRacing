@@ -6,7 +6,7 @@ const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-// Use the PORT environment variable or fall back to 3000 for local development
+// Use the PORT environment variable provided by Render
 const PORT = process.env.PORT || 3000;
 
 app.prepare().then(() => {
