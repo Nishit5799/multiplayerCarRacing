@@ -169,10 +169,7 @@ const CarController = forwardRef(
 
     const currentSpeed = useRef(0);
 
-    useFrame(({ camera, mouse }, delta) => {
-      const targetFPS = 60; // Target frame rate
-      const frameTime = 1 / targetFPS; // Time per frame at target FPS
-
+    useFrame(({ camera, mouse }) => {
       if (rb.current && isPlayer1) {
         const vel = rb.current.linvel();
         const movement = {
@@ -219,14 +216,13 @@ const CarController = forwardRef(
             setIsReversing(true);
             setIsMovingForward(false);
           }
-          rotationTarget.current +=
-            (ROTATION_SPEED * joystickInput.x * delta) / frameTime;
+          rotationTarget.current += ROTATION_SPEED * joystickInput.x;
         }
 
         if (currentSpeed.current < targetSpeed) {
-          currentSpeed.current += (ACCELERATION * delta) / frameTime;
+          currentSpeed.current += ACCELERATION;
         } else if (currentSpeed.current > targetSpeed) {
-          currentSpeed.current -= (DECELERATION * delta) / frameTime;
+          currentSpeed.current -= DECELERATION;
         }
 
         if (currentSpeed.current !== 0) {
@@ -243,23 +239,18 @@ const CarController = forwardRef(
         }
 
         if (movement.x !== 0) {
-          rotationTarget.current +=
-            (ROTATION_SPEED * movement.x * delta) / frameTime;
+          rotationTarget.current += ROTATION_SPEED * movement.x;
         }
 
         if (movement.x !== 0 || movement.z !== 0) {
           vel.x =
-            (Math.sin(rotationTarget.current) *
-              Math.abs(currentSpeed.current) *
-              movement.z *
-              delta) /
-            frameTime;
+            Math.sin(rotationTarget.current) *
+            Math.abs(currentSpeed.current) *
+            movement.z;
           vel.z =
-            (Math.cos(rotationTarget.current) *
-              Math.abs(currentSpeed.current) *
-              movement.z *
-              delta) /
-            frameTime;
+            Math.cos(rotationTarget.current) *
+            Math.abs(currentSpeed.current) *
+            movement.z;
         }
 
         rb.current.setLinvel(vel, true);
@@ -277,21 +268,15 @@ const CarController = forwardRef(
         container.current.rotation.y = MathUtils.lerp(
           container.current.rotation.y,
           rotationTarget.current,
-          (0.1 * delta) / frameTime
+          0.1
         );
         cameraPosition.current.getWorldPosition(cameraworldPosition.current);
-        camera.position.lerp(
-          cameraworldPosition.current,
-          (0.1 * delta) / frameTime
-        );
+        camera.position.lerp(cameraworldPosition.current, 0.1);
         if (cameraTarget.current) {
           cameraTarget.current.getWorldPosition(
             cameraLookAtWorldPosition.current
           );
-          cameraLookAt.current.lerp(
-            cameraLookAtWorldPosition.current,
-            (0.1 * delta) / frameTime
-          );
+          cameraLookAt.current.lerp(cameraLookAtWorldPosition.current, 0.1);
           camera.lookAt(cameraLookAt.current);
         }
       }
