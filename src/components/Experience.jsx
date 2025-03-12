@@ -91,23 +91,8 @@ const Experience = () => {
     }
   }, [showWelcomeScreen]);
 
-  useEffect(() => {
-    if (isTimerRunning) {
-      timerRef.current = setInterval(() => {
-        setCurrentTime((prevTime) => prevTime + 0.1);
-      }, 100);
-    } else {
-      clearInterval(timerRef.current);
-    }
-
-    return () => clearInterval(timerRef.current);
-  }, [isTimerRunning]);
-
   const handleRaceEnd = useCallback(
     (isPlayer1) => {
-      setIsTimerRunning(false);
-      clearInterval(timerRef.current);
-
       if (!players || players.length < 2) return;
 
       const winnerPlayer = isPlayer1 ? players[0] : players[1];
@@ -116,20 +101,34 @@ const Experience = () => {
       setWinner(winnerPlayer);
       setLoser(loserPlayer);
 
-      if (winnerPlayer.id === socket?.id) {
+      // Log the winner and loser in the console
+      console.log(
+        `Winner: ${winnerPlayer.name} (ID: ${winnerPlayer.id}), Is Player 1: ${isPlayer1}`
+      );
+      console.log(
+        `Loser: ${loserPlayer.name} (ID: ${
+          loserPlayer.id
+        }), Is Player 1: ${!isPlayer1}`
+      );
+
+      if (isPlayer1) {
+        // Current player is the winner
         setPopupMessage(`You won, ${winnerPlayer.name}! Well played!`);
         carControllerRef1.current?.playVictorySound(); // Play victory sound for the winner
-        carControllerRef2.current?.playLostSound(); // Play lost sound for the loser
       } else {
+        // Current player is the loser
         setPopupMessage(
-          `You lost, ${loserPlayer.name}. ${winnerPlayer.name} won the race. Let's try again!`
+          `You lost, ${winnerPlayer.name}. ${loserPlayer.name} won the race. Let's try again!`
         );
-        carControllerRef2.current?.playVictorySound(); // Play victory sound for the winner
+
         carControllerRef1.current?.playLostSound(); // Play lost sound for the loser
       }
 
       setShowPopup(true);
       hasStarted.current = false;
+
+      // Emit raceEnd event to the server
+      socket.emit("raceEnd", isPlayer1);
     },
     [players, socket]
   );
