@@ -21,6 +21,7 @@ import Background from "./Background";
 
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
+import Timer from "./Timer";
 
 const keyboardMap = [
   {
@@ -404,6 +405,15 @@ const Experience = () => {
         onMove={setJoystickInput}
         onStart={handleStart}
         disabled={!isGameStarted}
+      />
+      <Timer
+        
+        onReset={handleReset}
+        showPopup={showPopup}
+        popupMessage={popupMessage}
+        showInfoPopup={showInfoPopup}
+        setShowInfoPopup={setShowInfoPopup}
+        onInfoClick={handleInfoClick}
       />
     </>
   );
