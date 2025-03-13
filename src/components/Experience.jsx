@@ -292,6 +292,7 @@ const Experience = () => {
                   disabled={!isGameStarted}
                   position={[5, 0, 0]}
                   isPlayer1={players[0]?.id === socket.id}
+                  color={0x90902d} // yellow color
                 />
                 <CarController
                   ref={carControllerRef2}
@@ -301,6 +302,7 @@ const Experience = () => {
                   disabled={!isGameStarted}
                   position={[-5, 0, 0]}
                   isPlayer1={players[1]?.id === socket.id}
+                  color={0x2b2ba1} // blue color
                 />
               </>
             )}
@@ -407,7 +409,6 @@ const Experience = () => {
         disabled={!isGameStarted}
       />
       <Timer
-        
         onReset={handleReset}
         showPopup={showPopup}
         popupMessage={popupMessage}

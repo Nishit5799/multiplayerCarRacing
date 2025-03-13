@@ -15,7 +15,7 @@ import { MathUtils } from "three/src/math/MathUtils";
 import { useSocket } from "../context/SocketContext";
 
 const CarController = forwardRef(
-  ({ joystickInput, onRaceEnd, onStart, position, isPlayer1 }, ref) => {
+  ({ joystickInput, onRaceEnd, onStart, position, isPlayer1, color }, ref) => {
     const socket = useSocket();
     const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 640);
     const [isBraking, setIsBraking] = useState(false);
@@ -330,6 +330,7 @@ const CarController = forwardRef(
               position-y={-0.25}
               isBraking={isBraking}
               isReversing={isReversing}
+              color={color}
             />
             <CapsuleCollider args={[0.5, 3.5]} position={[0, 3, 0]} />
           </group>
