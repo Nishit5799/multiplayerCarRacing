@@ -150,8 +150,8 @@ const CarController = forwardRef(
       }
     };
 
-    const WALK_SPEED = isSmallScreen ? 50 : 100;
-    const RUN_SPEED = 130;
+    const WALK_SPEED = isSmallScreen ? 90 : 100;
+    const RUN_SPEED = 100;
     const ROTATION_SPEED = isSmallScreen ? 0.03 : 0.02;
     const ACCELERATION = 0.5;
     const DECELERATION = 1;
