@@ -52,6 +52,12 @@ app.prepare().then(() => {
       io.emit("resetGame");
     });
 
+    // New event listener for player refreshing
+    socket.on("playerRefreshing", () => {
+      // Broadcast the event to all players
+      io.emit("playerRefreshing");
+    });
+
     socket.on("disconnect", () => {
       console.log("a user disconnected:", socket.id);
       players = players.filter((player) => player.id !== socket.id);

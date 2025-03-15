@@ -1,6 +1,8 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { SocketProvider } from "@/context/SocketContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -28,6 +30,18 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <SocketProvider>{children}</SocketProvider>
+        <ToastContainer
+          position="top-center"
+          autoClose={2000} // Toast will close after 2 seconds
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick={false}
+          rtl={false}
+          pauseOnFocusLoss={false}
+          draggable={false}
+          pauseOnHover={false}
+          style={{ zIndex: 9999 }} // Ensure the toast is above all other elements
+        />
       </body>
     </html>
   );

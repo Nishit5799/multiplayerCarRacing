@@ -125,3 +125,44 @@
     margin-left: 80%;
   }
 }
+/* Custom styles for react-toastify */
+.Toastify__toast-container {
+  z-index: 999999 !important; /* Set a very high z-index */
+}
+
+.Toastify__toast {
+  font-family: var(--font-geist-sans); /* Use your custom font if needed */
+  font-size: 14px;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.Toastify__toast--info {
+  background-color: #3498db; /* Customize info toast background color */
+  color: #fff;
+}
+
+.Toastify__toast--success {
+  background-color: #2ecc71; /* Customize success toast background color */
+  color: #fff;
+}
+
+.Toastify__toast--error {
+  background-color: #e74c3c; /* Customize error toast background color */
+  color: #fff;
+}
+
+.Toastify__toast--warning {
+  background-color: #f1c40f; /* Customize warning toast background color */
+  color: #fff;
+}
+
+.Toastify__close-button {
+  color: #fff;
+  opacity: 0.8;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}

@@ -351,3 +351,6 @@ const CarController = forwardRef(
 );
 
 export default CarController;
+
+
+<CapsuleCollider args={[0.5, 3.5]} position={[0, 3, 0]} />

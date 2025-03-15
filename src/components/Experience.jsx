@@ -18,10 +18,10 @@ import Racetrack from "./Racetrack";
 import CarController from "./CarController";
 import Joystick from "./Joystick";
 import Background from "./Background";
-
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import Timer from "./Timer";
+import { toast } from "react-toastify";
 
 const keyboardMap = [
   {
@@ -92,6 +92,65 @@ const Experience = () => {
     }
   }, [showWelcomeScreen]);
 
+  useEffect(() => {
+    let isToastShown = false; // Flag to ensure toast is only shown once
+
+    const handleBeforeUnload = () => {
+      if (socket && isGameStarted && !isToastShown) {
+        isToastShown = true; // Set the flag to true
+
+        // Emit a custom event to notify the server that a player is refreshing
+        socket.emit("playerRefreshing");
+
+        // Show the toast immediately
+        toast.info("Player exited", {
+          position: "top-center",
+          autoClose: 2000, // Toast will close after 2 seconds
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: false,
+          draggable: false,
+          style: { zIndex: 9999, position: "fixed" }, // Ensure the toast is above all other elements
+        });
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [socket, isGameStarted]);
+
+  useEffect(() => {
+    if (socket) {
+      // Listen for the "playerRefreshing" event from the server
+      socket.on("playerRefreshing", () => {
+        // Show the toast for both players
+        toast.info("Player exited", {
+          position: "top-center",
+          autoClose: 2000, // Toast will close after 2 seconds
+          hideProgressBar: true,
+          closeOnClick: false,
+          pauseOnHover: false,
+          draggable: false,
+          style: { zIndex: 9999, position: "fixed" }, // Ensure the toast is above all other elements
+        });
+
+        // Refresh the page after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket.off("playerRefreshing"); // Clean up the event listener
+      }
+    };
+  }, [socket]);
+
   const handleRaceEnd = useCallback(
     (isPlayer1) => {
       if (!players || players.length < 2) return;
@@ -102,7 +161,6 @@ const Experience = () => {
       setWinner(winnerPlayer);
       setLoser(loserPlayer);
 
-      // Log the winner and loser in the console
       console.log(
         `Winner: ${winnerPlayer.name} (ID: ${winnerPlayer.id}), Is Player 1: ${isPlayer1}`
       );
@@ -113,22 +171,18 @@ const Experience = () => {
       );
 
       if (isPlayer1) {
-        // Current player is the winner
         setPopupMessage(`You won, ${winnerPlayer.name}! Well played!`);
-        carControllerRef1.current?.playVictorySound(); // Play victory sound for the winner
+        carControllerRef1.current?.playVictorySound();
       } else {
-        // Current player is the loser
         setPopupMessage(
           `You lost, ${winnerPlayer.name}. ${loserPlayer.name} won the race. Let's try again!`
         );
-
-        carControllerRef1.current?.playLostSound(); // Play lost sound for the loser
+        carControllerRef1.current?.playLostSound();
       }
 
       setShowPopup(true);
       hasStarted.current = false;
 
-      // Emit raceEnd event to the server
       socket.emit("raceEnd", isPlayer1);
     },
     [players, socket]
