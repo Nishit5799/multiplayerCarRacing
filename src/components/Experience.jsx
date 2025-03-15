@@ -98,11 +98,6 @@ const Experience = () => {
     const handleBeforeUnload = () => {
       if (socket && isGameStarted && !isToastShown) {
         isToastShown = true; // Set the flag to true
-
-        // Emit a custom event to notify the server that a player is refreshing
-        socket.emit("playerRefreshing");
-
-        // Show the toast immediately
         toast.info("Player exited", {
           position: "top-center",
           autoClose: 2000, // Toast will close after 2 seconds
@@ -112,6 +107,8 @@ const Experience = () => {
           draggable: false,
           style: { zIndex: 9999, position: "fixed" }, // Ensure the toast is above all other elements
         });
+
+        socket.emit("restartGame");
       }
     };
 
@@ -121,35 +118,6 @@ const Experience = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, [socket, isGameStarted]);
-
-  useEffect(() => {
-    if (socket) {
-      // Listen for the "playerRefreshing" event from the server
-      socket.on("playerRefreshing", () => {
-        // Show the toast for both players
-        toast.info("Player exited", {
-          position: "top-center",
-          autoClose: 2000, // Toast will close after 2 seconds
-          hideProgressBar: true,
-          closeOnClick: false,
-          pauseOnHover: false,
-          draggable: false,
-          style: { zIndex: 9999, position: "fixed" }, // Ensure the toast is above all other elements
-        });
-
-        // Refresh the page after 2 seconds
-        setTimeout(() => {
-          window.location.reload();
-        }, 2000);
-      });
-    }
-
-    return () => {
-      if (socket) {
-        socket.off("playerRefreshing"); // Clean up the event listener
-      }
-    };
-  }, [socket]);
 
   const handleRaceEnd = useCallback(
     (isPlayer1) => {
