@@ -1,4 +1,3 @@
-// src/components/Experience.jsx
 "use client";
 import React, {
   useRef,
@@ -21,7 +20,6 @@ import Background from "./Background";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import Timer from "./Timer";
-import { toast } from "react-toastify";
 
 const keyboardMap = [
   {
@@ -66,6 +64,7 @@ const Experience = () => {
   const [showUsernamePopup, setShowUsernamePopup] = useState(false);
   const [winner, setWinner] = useState(null);
   const [loser, setLoser] = useState(null);
+  const [playerLeft, setPlayerLeft] = useState(false); // New state to track if a player has left
   const timerRef = useRef(null);
   const carControllerRef1 = useRef();
   const carControllerRef2 = useRef();
@@ -91,33 +90,6 @@ const Experience = () => {
       );
     }
   }, [showWelcomeScreen]);
-
-  useEffect(() => {
-    let isToastShown = false; // Flag to ensure toast is only shown once
-
-    const handleBeforeUnload = () => {
-      if (socket && isGameStarted && !isToastShown) {
-        isToastShown = true; // Set the flag to true
-        toast.info("Player exited", {
-          position: "top-center",
-          autoClose: 2000, // Toast will close after 2 seconds
-          hideProgressBar: true,
-          closeOnClick: false,
-          pauseOnHover: false,
-          draggable: false,
-          style: { zIndex: 9999, position: "fixed" }, // Ensure the toast is above all other elements
-        });
-
-        socket.emit("restartGame");
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [socket, isGameStarted]);
 
   const handleRaceEnd = useCallback(
     (isPlayer1) => {
@@ -170,6 +142,7 @@ const Experience = () => {
     setShowPopup(false);
     setWinner(null);
     setLoser(null);
+    setPlayerLeft(false); // Reset player left state
     hasStarted.current = false;
     if (carControllerRef1.current) {
       carControllerRef1.current.respawn();
@@ -221,6 +194,13 @@ const Experience = () => {
         } else {
           setShowUsernamePopup(false);
         }
+
+        // Check if the game has started and a player has left
+        if (isGameStarted && players.length === 1) {
+          setPlayerLeft(true);
+          setPopupMessage("The other player has left the game.");
+          setShowPopup(true);
+        }
       });
 
       socket.on("startGame", () => {
@@ -241,10 +221,9 @@ const Experience = () => {
         window.location.reload();
       });
     }
-  }, [socket]);
+  }, [socket, isGameStarted]);
 
   const memoizedKeyboardMap = useMemo(() => keyboardMap, []);
-
   return (
     <>
       <KeyboardControls map={memoizedKeyboardMap}>

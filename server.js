@@ -49,7 +49,7 @@ app.prepare().then(() => {
 
     socket.on("restartGame", () => {
       players = [];
-      io.emit("resetGame");
+      io.emit("restartGame"); // Broadcast to all players
     });
 
     socket.on("disconnect", () => {
