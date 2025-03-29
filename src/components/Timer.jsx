@@ -11,12 +11,15 @@ const Timer = ({
   onInfoClick,
 }) => {
   const infoMessage = `
-    Navigate the car along the road and complete the course as quickly as possible. 
-    If you move off the road, your car will reset to the starting position. 
-    You can press the "Reset" button to restart the timer and return to the beginning.
+Compete against another player in real-time. The first one to cross the finish line wins the race. Follow the race track carefully.
+ If you go off the track, your car will fall, and you’ll have to start over from the beginning. Precision is key!
+
+ Tips:
+1. Avoid sharp turns at high speeds to prevent losing control.
+2. Stay focused and follow the track to avoid falling off.
 
     Controls:
-    - Desktop: Use W, A, S, D for movement and SHIFT for a speed boost.
+    - Desktop: Use W, A, S, D for movement.
     - Mobile: Use the on-screen joystick for movement.
   `;
 

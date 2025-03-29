@@ -48,9 +48,7 @@ const Experience = () => {
   const socket = useSocket();
   const shadowCameraRef = useRef();
   const [joystickInput, setJoystickInput] = useState({ x: 0, y: 0 });
-  const [bestTime, setBestTime] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [showInfoPopup, setShowInfoPopup] = useState(false);
@@ -61,16 +59,44 @@ const Experience = () => {
   const [isReady, setIsReady] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const [hasJoinedRoom, setHasJoinedRoom] = useState(false);
-  const [showUsernamePopup, setShowUsernamePopup] = useState(false);
+
   const [winner, setWinner] = useState(null);
   const [loser, setLoser] = useState(null);
-  const [playerLeft, setPlayerLeft] = useState(false); // New state to track if a player has left
-  const timerRef = useRef(null);
+  const [playerLeft, setPlayerLeft] = useState(false);
+  const [isUsernameValid, setIsUsernameValid] = useState(true);
+  const [restartCountdown, setRestartCountdown] = useState(null); // New state for restart countdown
+
   const carControllerRef1 = useRef();
   const carControllerRef2 = useRef();
   const blockRef = useRef();
   const hasStarted = useRef(false);
   const welcomeTextRef = useRef();
+
+  // Check if the username already exists in the lobby
+  const isUsernameUnique = (name) => {
+    return !players.some((player) => player.name === name);
+  };
+
+  const handleJoinRoom = () => {
+    const trimmedName = playerName.trim();
+    if (trimmedName !== "" && !hasJoinedRoom) {
+      if (isUsernameUnique(trimmedName)) {
+        socket.emit("joinRoom", trimmedName);
+        setHasJoinedRoom(true);
+
+        setIsUsernameValid(true);
+      } else {
+        setIsUsernameValid(false);
+      }
+    }
+  };
+
+  // Update the username validity when the player name changes
+  useEffect(() => {
+    if (playerName.trim() !== "") {
+      setIsUsernameValid(isUsernameUnique(playerName.trim()));
+    }
+  }, [playerName, players]);
 
   useEffect(() => {
     if (showWelcomeScreen) {
@@ -128,55 +154,37 @@ const Experience = () => {
     [players, socket]
   );
 
-  const handleStart = useCallback(() => {
-    if (!hasStarted.current) {
-      setCurrentTime(0);
-      setIsTimerRunning(true);
-      hasStarted.current = true;
-    }
-  }, []);
-
   const handleReset = useCallback(() => {
-    setCurrentTime(0);
-    setIsTimerRunning(false);
-    setShowPopup(false);
-    setWinner(null);
-    setLoser(null);
-    setPlayerLeft(false); // Reset player left state
-    hasStarted.current = false;
-    if (carControllerRef1.current) {
-      carControllerRef1.current.respawn();
-    }
-    if (carControllerRef2.current) {
-      carControllerRef2.current.respawn();
-    }
-    if (blockRef.current) {
-      blockRef.current.setEnabled(true);
-    }
-    setShowWelcomeScreen(true);
-    setPlayers([]);
-    setIsReady(false);
-    setHasJoinedRoom(false);
-    setPlayerName("");
-    socket.emit("restartGame");
-    window.location.reload();
+    setRestartCountdown(2); // Start the countdown from 2 seconds
+
+    setTimeout(() => {
+      setShowPopup(false);
+      setWinner(null);
+      setLoser(null);
+      setPlayerLeft(false);
+      hasStarted.current = false;
+      if (carControllerRef1.current) {
+        carControllerRef1.current.respawn();
+      }
+      if (carControllerRef2.current) {
+        carControllerRef2.current.respawn();
+      }
+      if (blockRef.current) {
+        blockRef.current.setEnabled(true);
+      }
+      setShowWelcomeScreen(true);
+      setPlayers([]);
+      setIsReady(false);
+      setHasJoinedRoom(false);
+      setPlayerName("");
+      socket.emit("restartGame");
+      window.location.reload();
+    }, 2000); // 2 seconds delay
   }, [socket]);
 
   const handleInfoClick = useCallback(() => {
     setShowInfoPopup(true);
   }, []);
-
-  const handlePlayGame = useCallback(() => {
-    setShowWelcomeScreen(false);
-    setIsGameStarted(true);
-  }, []);
-
-  const handleJoinRoom = () => {
-    if (playerName.trim() !== "" && !hasJoinedRoom) {
-      socket.emit("joinRoom", playerName);
-      setHasJoinedRoom(true);
-    }
-  };
 
   const handleReady = () => {
     socket.emit("playerReady", playerName);
@@ -189,17 +197,12 @@ const Experience = () => {
         console.log("Received updatePlayers event:", players);
         setPlayers(players);
 
-        if (players.length === 2 && players[0].name === players[1].name) {
-          setShowUsernamePopup(true);
-        } else {
-          setShowUsernamePopup(false);
-        }
-
         // Check if the game has started and a player has left
         if (isGameStarted && players.length === 1) {
           setPlayerLeft(true);
           setPopupMessage("The other player has left the game.");
           setShowPopup(true);
+          handleReset(); // Automatically trigger reset when a player leaves
         }
       });
 
@@ -217,13 +220,36 @@ const Experience = () => {
         }, 1000);
       });
 
-      socket.on("resetGame", () => {
+      socket.on("restartGame", () => {
         window.location.reload();
       });
+
+      socket.on("usernameTaken", () => {
+        setIsUsernameValid(false);
+      });
+
+      // Clean up event listeners when the component unmounts
+      return () => {
+        socket.off("updatePlayers");
+        socket.off("startGame");
+        socket.off("restartGame");
+        socket.off("usernameTaken");
+      };
     }
-  }, [socket, isGameStarted]);
+  }, [socket, isGameStarted, players, handleReset]);
 
   const memoizedKeyboardMap = useMemo(() => keyboardMap, []);
+
+  // Effect to handle the restart countdown
+  useEffect(() => {
+    if (restartCountdown !== null && restartCountdown > 0) {
+      const interval = setInterval(() => {
+        setRestartCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [restartCountdown]);
+
   return (
     <>
       <KeyboardControls map={memoizedKeyboardMap}>
@@ -289,7 +315,6 @@ const Experience = () => {
                   ref={carControllerRef1}
                   joystickInput={joystickInput}
                   onRaceEnd={handleRaceEnd}
-                  onStart={handleStart}
                   disabled={!isGameStarted}
                   position={[5, 0, 0]}
                   isPlayer1={players[0]?.id === socket.id}
@@ -299,7 +324,6 @@ const Experience = () => {
                   ref={carControllerRef2}
                   joystickInput={joystickInput}
                   onRaceEnd={handleRaceEnd}
-                  onStart={handleStart}
                   disabled={!isGameStarted}
                   position={[-5, 0, 0]}
                   isPlayer1={players[1]?.id === socket.id}
@@ -336,9 +360,9 @@ const Experience = () => {
             <div>
               <button
                 onClick={handleJoinRoom}
-                disabled={hasJoinedRoom}
+                disabled={hasJoinedRoom || !isUsernameValid}
                 className={`px-8 py-2 font-choco tracking-widest bg-orange-500 text-white sm:text-2xl text-3xl font-bold rounded-lg ${
-                  hasJoinedRoom
+                  hasJoinedRoom || !isUsernameValid
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-orange-600"
                 } transition-colors`}
@@ -383,32 +407,26 @@ const Experience = () => {
         </div>
       )}
 
-      {showUsernamePopup && (
-        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-4 py-2 rounded-lg z-[102]">
-          Username already exists! Please choose a different name.
-        </div>
-      )}
-
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-[103]">
           <div className="bg-white p-8 rounded-lg text-center">
             <h2 className="text-2xl font-bold mb-4">Race Over!</h2>
             <p className="mb-4">{popupMessage}</p>
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-            >
-              Restart
-            </button>
+            {restartCountdown !== null ? (
+              <p className="text-black">RESTARTING IN {restartCountdown}...</p>
+            ) : (
+              <button
+                onClick={handleReset}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+              >
+                Restart
+              </button>
+            )}
           </div>
         </div>
       )}
 
-      <Joystick
-        onMove={setJoystickInput}
-        onStart={handleStart}
-        disabled={!isGameStarted}
-      />
+      <Joystick onMove={setJoystickInput} disabled={!isGameStarted} />
       <Timer
         onReset={handleReset}
         showPopup={showPopup}

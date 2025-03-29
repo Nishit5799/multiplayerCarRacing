@@ -15,7 +15,7 @@ import { MathUtils } from "three/src/math/MathUtils";
 import { useSocket } from "../context/SocketContext";
 
 const CarController = forwardRef(
-  ({ joystickInput, onRaceEnd, onStart, position, isPlayer1, color }, ref) => {
+  ({ joystickInput, onRaceEnd, position, isPlayer1, color }, ref) => {
     const socket = useSocket();
     const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 640);
     const [isBraking, setIsBraking] = useState(false);
@@ -182,7 +182,7 @@ const CarController = forwardRef(
         const { forward, backward, left, right, run } = get();
         if (forward) {
           targetSpeed = run ? RUN_SPEED : WALK_SPEED;
-          onStart();
+
           setIsBraking(false);
           setIsReversing(false);
           setIsMovingForward(true);
