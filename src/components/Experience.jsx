@@ -424,10 +424,7 @@ const Experience = () => {
         </div>
       )}
 
-      <Joystick
-        onMove={setJoystickInput}
-        disabled={!isGameStarted || players.length !== 2}
-      />
+      <Joystick onMove={setJoystickInput} disabled={!isGameStarted} />
       <Timer
         onReset={handleReset}
         showPopup={showPopup}
