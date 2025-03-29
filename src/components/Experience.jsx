@@ -64,7 +64,7 @@ const Experience = () => {
   const [loser, setLoser] = useState(null);
   const [playerLeft, setPlayerLeft] = useState(false);
   const [isUsernameValid, setIsUsernameValid] = useState(true);
-  const [restartCountdown, setRestartCountdown] = useState(null); // New state for restart countdown
+  const [restartCountdown, setRestartCountdown] = useState(null);
 
   const carControllerRef1 = useRef();
   const carControllerRef2 = useRef();
@@ -72,7 +72,6 @@ const Experience = () => {
   const hasStarted = useRef(false);
   const welcomeTextRef = useRef();
 
-  // Check if the username already exists in the lobby
   const isUsernameUnique = (name) => {
     return !players.some((player) => player.name === name);
   };
@@ -83,7 +82,6 @@ const Experience = () => {
       if (isUsernameUnique(trimmedName)) {
         socket.emit("joinRoom", trimmedName);
         setHasJoinedRoom(true);
-
         setIsUsernameValid(true);
       } else {
         setIsUsernameValid(false);
@@ -91,7 +89,6 @@ const Experience = () => {
     }
   };
 
-  // Update the username validity when the player name changes
   useEffect(() => {
     if (playerName.trim() !== "") {
       setIsUsernameValid(isUsernameUnique(playerName.trim()));
@@ -155,7 +152,7 @@ const Experience = () => {
   );
 
   const handleReset = useCallback(() => {
-    setRestartCountdown(2); // Start the countdown from 2 seconds
+    setRestartCountdown(2);
 
     setTimeout(() => {
       setShowPopup(false);
@@ -179,7 +176,7 @@ const Experience = () => {
       setPlayerName("");
       socket.emit("restartGame");
       window.location.reload();
-    }, 2000); // 2 seconds delay
+    }, 2000);
   }, [socket]);
 
   const handleInfoClick = useCallback(() => {
@@ -197,12 +194,11 @@ const Experience = () => {
         console.log("Received updatePlayers event:", players);
         setPlayers(players);
 
-        // Check if the game has started and a player has left
         if (isGameStarted && players.length === 1) {
           setPlayerLeft(true);
           setPopupMessage("The other player has left the game.");
           setShowPopup(true);
-          handleReset(); // Automatically trigger reset when a player leaves
+          handleReset();
         }
       });
 
@@ -228,7 +224,6 @@ const Experience = () => {
         setIsUsernameValid(false);
       });
 
-      // Clean up event listeners when the component unmounts
       return () => {
         socket.off("updatePlayers");
         socket.off("startGame");
@@ -240,7 +235,6 @@ const Experience = () => {
 
   const memoizedKeyboardMap = useMemo(() => keyboardMap, []);
 
-  // Effect to handle the restart countdown
   useEffect(() => {
     if (restartCountdown !== null && restartCountdown > 0) {
       const interval = setInterval(() => {
@@ -313,21 +307,25 @@ const Experience = () => {
               <>
                 <CarController
                   ref={carControllerRef1}
-                  joystickInput={joystickInput}
+                  joystickInput={
+                    players[0]?.id === socket.id ? joystickInput : null
+                  }
                   onRaceEnd={handleRaceEnd}
                   disabled={!isGameStarted}
                   position={[5, 0, 0]}
                   isPlayer1={players[0]?.id === socket.id}
-                  color={0x90902d} // yellow color
+                  color={0x90902d}
                 />
                 <CarController
                   ref={carControllerRef2}
-                  joystickInput={joystickInput}
+                  joystickInput={
+                    players[1]?.id === socket.id ? joystickInput : null
+                  }
                   onRaceEnd={handleRaceEnd}
                   disabled={!isGameStarted}
                   position={[-5, 0, 0]}
                   isPlayer1={players[1]?.id === socket.id}
-                  color={0x2b2ba1} // blue color
+                  color={0x2b2ba1}
                 />
               </>
             )}
@@ -426,7 +424,10 @@ const Experience = () => {
         </div>
       )}
 
-      <Joystick onMove={setJoystickInput} disabled={!isGameStarted} />
+      <Joystick
+        onMove={setJoystickInput}
+        disabled={!isGameStarted || players.length !== 2}
+      />
       <Timer
         onReset={handleReset}
         showPopup={showPopup}

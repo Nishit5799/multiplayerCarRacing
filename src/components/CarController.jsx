@@ -169,7 +169,7 @@ const CarController = forwardRef(
 
     const currentSpeed = useRef(0);
 
-    useFrame(({ camera, mouse }) => {
+    useFrame(({ camera }) => {
       if (rb.current && isPlayer1) {
         const vel = rb.current.linvel();
         const movement = {
@@ -182,17 +182,17 @@ const CarController = forwardRef(
         const { forward, backward, left, right, run } = get();
         if (forward) {
           targetSpeed = run ? RUN_SPEED : WALK_SPEED;
-
           setIsBraking(false);
           setIsReversing(false);
           setIsMovingForward(true);
         } else if (backward) {
           if (currentSpeed.current > 0) {
             targetSpeed = 0;
+            setIsBraking(true);
           } else {
-            targetSpeed = 0;
+            targetSpeed = -WALK_SPEED * 0.5;
+            setIsReversing(true);
           }
-          setIsReversing(true);
           setIsMovingForward(false);
         } else {
           setIsReversing(false);
@@ -200,23 +200,30 @@ const CarController = forwardRef(
           setIsMovingForward(false);
         }
 
+        // Handle joystick input
         if (joystickInput) {
-          if (joystickInput.y < 0) {
+          if (joystickInput.y < -0.1) {
+            // Forward (joystick pushed up)
             targetSpeed = WALK_SPEED;
-            onStart();
             setIsBraking(false);
             setIsReversing(false);
             setIsMovingForward(true);
-          } else if (joystickInput.y > 0) {
+          } else if (joystickInput.y > 0.1) {
+            // Backward (joystick pushed down)
             if (currentSpeed.current > 0) {
               targetSpeed = 0;
+              setIsBraking(true);
             } else {
-              targetSpeed = 0;
+              targetSpeed = -WALK_SPEED * 0.5;
+              setIsReversing(true);
             }
-            setIsReversing(true);
             setIsMovingForward(false);
           }
-          rotationTarget.current += ROTATION_SPEED * joystickInput.x;
+
+          // Rotation handling
+          if (Math.abs(joystickInput.x) > 0.1) {
+            rotationTarget.current += ROTATION_SPEED * joystickInput.x;
+          }
         }
 
         if (currentSpeed.current < targetSpeed) {
@@ -228,8 +235,6 @@ const CarController = forwardRef(
         if (currentSpeed.current !== 0) {
           movement.z = currentSpeed.current > 0 ? -1 : 1;
         }
-
-        setIsBraking(currentSpeed.current < 0);
 
         if (left) {
           movement.x = 1;
@@ -294,7 +299,11 @@ const CarController = forwardRef(
     }, [socket, isPlayer1]);
 
     const respawn = () => {
-      rb.current.setTranslation({ x: 0, y: -10, z: -10 });
+      rb.current.setTranslation({
+        x: position[0],
+        y: position[1],
+        z: position[2],
+      });
       rb.current.setLinvel({ x: 0, y: 0, z: 0 });
       rb.current.setAngvel({ x: 0, y: 0, z: 0 });
       rotationTarget.current = 0;
@@ -315,7 +324,7 @@ const CarController = forwardRef(
         gravityScale={9}
         onIntersectionEnter={({ other }) => {
           if (other.rigidBodyObject.name === "raceEnd") {
-            onRaceEnd(isPlayer1); // Pass isPlayer1 to onRaceEnd
+            onRaceEnd(isPlayer1);
           } else if (other.rigidBodyObject.name === "space") {
             respawn();
           }
