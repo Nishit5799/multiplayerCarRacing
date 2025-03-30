@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 
-const Joystick = ({ onMove, onStart, disabled }) => {
+const Joystick = ({ onMove, onStart = () => {}, disabled }) => {
   const joystickRef = useRef(null);
   const thumbstickRef = useRef(null);
   const touchIdRef = useRef(null);

@@ -7,11 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import { Canvas } from "@react-three/fiber";
-import {
-  
-  KeyboardControls,
-  OrthographicCamera,
-} from "@react-three/drei";
+import { KeyboardControls, OrthographicCamera } from "@react-three/drei";
 import { CuboidCollider, Physics, RigidBody } from "@react-three/rapier";
 import Racetrack from "./Racetrack";
 import CarController from "./CarController";
@@ -426,6 +422,7 @@ const Experience = () => {
 
       <Joystick
         onMove={setJoystickInput}
+        onStart={() => {}} // Add this empty function for now
         disabled={!isGameStarted || players.length !== 2}
       />
       <Timer

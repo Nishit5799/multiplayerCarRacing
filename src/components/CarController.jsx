@@ -203,7 +203,6 @@ const CarController = forwardRef(
         if (joystickInput) {
           if (joystickInput.y < 0) {
             targetSpeed = WALK_SPEED;
-            onStart();
             setIsBraking(false);
             setIsReversing(false);
             setIsMovingForward(true);
