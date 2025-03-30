@@ -374,7 +374,7 @@ const Experience = () => {
         </div>
       )}
 
-      {!isGameStarted && (
+      {hasJoinedRoom && !isGameStarted && (
         <div className="fixed bottom-5 right-5 bg-black bg-opacity-50 text-white p-4 rounded-lg z-[100]">
           <h3>Lobby</h3>
           {players.map((player, index) => (
