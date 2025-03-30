@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { Canvas } from "@react-three/fiber";
 import {
-  Environment,
+  
   KeyboardControls,
   OrthographicCamera,
 } from "@react-three/drei";
@@ -424,7 +424,10 @@ const Experience = () => {
         </div>
       )}
 
-      <Joystick onMove={setJoystickInput} disabled={!isGameStarted} />
+      <Joystick
+        onMove={setJoystickInput}
+        disabled={!isGameStarted || players.length !== 2}
+      />
       <Timer
         onReset={handleReset}
         showPopup={showPopup}
