@@ -55,6 +55,7 @@ const Experience = () => {
   const [isReady, setIsReady] = useState(false);
   const [countdown, setCountdown] = useState(null);
   const [hasJoinedRoom, setHasJoinedRoom] = useState(false);
+  const [shouldReload, setShouldReload] = useState(false);
 
   const [winner, setWinner] = useState(null);
   const [loser, setLoser] = useState(null);
@@ -75,6 +76,13 @@ const Experience = () => {
   const handleJoinRoom = () => {
     const trimmedName = playerName.trim();
     if (trimmedName !== "" && !hasJoinedRoom) {
+      if (players.length >= 2) {
+        setPopupMessage("Room is already full. Please try again later.");
+        setShowPopup(true);
+        setTimeout(() => window.location.reload(), 1000);
+        return;
+      }
+
       if (isUsernameUnique(trimmedName)) {
         socket.emit("joinRoom", trimmedName);
         setHasJoinedRoom(true);
@@ -185,9 +193,35 @@ const Experience = () => {
   };
 
   useEffect(() => {
+    if (shouldReload) {
+      const timer = setTimeout(() => {
+        window.location.reload();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldReload]);
+
+  useEffect(() => {
     if (socket) {
       socket.on("updatePlayers", (players) => {
         console.log("Received updatePlayers event:", players);
+
+        // Check if current player is in position 2 or higher
+        if (players.length > 2) {
+          const currentPlayerIndex = players.findIndex(
+            (p) => p.id === socket.id
+          );
+          if (currentPlayerIndex >= 2) {
+            console.log(
+              `Player ${socket.id} is in position ${
+                currentPlayerIndex + 1
+              }, reloading...`
+            );
+            setShouldReload(true);
+            return; // Don't update state since we're reloading
+          }
+        }
+
         setPlayers(players);
 
         if (isGameStarted && players.length === 1) {
@@ -227,7 +261,7 @@ const Experience = () => {
         socket.off("usernameTaken");
       };
     }
-  }, [socket, isGameStarted, players, handleReset]);
+  }, [socket, isGameStarted, players, handleReset, shouldReload]);
 
   const memoizedKeyboardMap = useMemo(() => keyboardMap, []);
 
@@ -332,6 +366,20 @@ const Experience = () => {
       {showWelcomeScreen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50 start">
           <div className="text-center">
+            {hasJoinedRoom && (
+              <button
+                onClick={() => {
+                  socket.emit("playerRestart", {
+                    playerId: socket.id,
+                    playerName,
+                  });
+                  window.location.reload();
+                }}
+                className="absolute top-4 left-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+              >
+                Exit
+              </button>
+            )}
             <div
               ref={welcomeTextRef}
               className="font-choco tracking-wider text-5xl font-bold text-yellow-400 mb-8 flex"
@@ -422,7 +470,7 @@ const Experience = () => {
 
       <Joystick
         onMove={setJoystickInput}
-        onStart={() => {}} // Add this empty function for now
+        onStart={() => {}}
         disabled={!isGameStarted || players.length !== 2}
       />
       <Timer

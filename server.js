@@ -150,6 +150,11 @@ Promise.all([pubClient.connect(), subClient.connect()])
           io.to(roomId).emit("restartGame");
         });
 
+        socket.on("playerRestart", (data) => {
+          console.log(
+            `Player ${data.playerName} (${data.playerId}) restarted their game`
+          );
+        });
         // Handle disconnections
         socket.on("disconnect", () => {
           console.log(`Disconnected: ${socket.id}`);
