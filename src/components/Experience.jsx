@@ -400,7 +400,7 @@ const Experience = () => {
                 className="px-4 py-2 mb-4 rounded-lg"
               />
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 sm:w-[70%] w-[80%] mx-auto">
               <button
                 onClick={handleJoinRoom}
                 disabled={hasJoinedRoom || !isUsernameValid}
@@ -416,7 +416,7 @@ const Experience = () => {
                 href={practiceLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={` py-2 font-choco tracking-widest bg-purple-500 text-white sm:text-2xl text-3xl font-bold rounded-lg text-center ${
+                className={` px-8 py-2 font-choco tracking-widest bg-purple-500 text-white sm:text-2xl text-3xl font-bold rounded-lg text-center ${
                   hasJoinedRoom
                     ? "opacity-50 cursor-not-allowed pointer-events-none"
                     : "hover:bg-purple-600"
@@ -427,7 +427,7 @@ const Experience = () => {
             </div>
             <div
               onClick={handleInfoClick}
-              className="mt-4 py-2 font-choco text-white sm:text-2xl text-3xl tracking-widest cursor-pointer bg-blue-500 hover:bg-blue-600 sm:w-[50%] w-[57%] h-[30%] mx-auto rounded-lg transition-colors"
+              className="mt-4 py-2 font-choco text-white sm:text-2xl text-3xl tracking-widest cursor-pointer bg-blue-500 hover:bg-blue-600 sm:w-[70%] w-[80%] mx-auto rounded-lg transition-colors"
             >
               HOW TO PLAY?
             </div>
