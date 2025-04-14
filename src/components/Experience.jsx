@@ -403,9 +403,15 @@ const Experience = () => {
             <div className="flex flex-col gap-4 sm:w-[70%] w-[80%] mx-auto">
               <button
                 onClick={handleJoinRoom}
-                disabled={hasJoinedRoom || !isUsernameValid}
+                disabled={
+                  hasJoinedRoom ||
+                  !isUsernameValid ||
+                  playerName.trim().length === 0
+                }
                 className={`px-8 py-2 font-choco tracking-widest bg-orange-500 text-white sm:text-2xl text-3xl font-bold rounded-lg ${
-                  hasJoinedRoom || !isUsernameValid
+                  hasJoinedRoom ||
+                  !isUsernameValid ||
+                  playerName.trim().length === 0
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-orange-600"
                 } transition-colors`}
