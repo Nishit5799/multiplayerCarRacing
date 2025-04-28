@@ -62,7 +62,7 @@ const Experience = () => {
   const [playerLeft, setPlayerLeft] = useState(false);
   const [isUsernameValid, setIsUsernameValid] = useState(true);
   const [restartCountdown, setRestartCountdown] = useState(null);
-  const [practiceLink] = useState("https://practice-car-psi.vercel.app/"); // Replace with your actual practice mode URL
+  const [practiceLink] = useState("https://race-car-timing.vercel.app/"); // Replace with your actual practice mode URL
 
   const carControllerRef1 = useRef();
   const carControllerRef2 = useRef();
