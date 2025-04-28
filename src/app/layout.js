@@ -14,10 +14,10 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "NISHKART | COUNTDOWN BEGINS",
-  description: "Complete the race with your best time",
+  title: "NISHKART | RACE BEGINS",
+  description: "Complete the race before your opponent",
   icons: {
-    icon: "/fav.png", // Path to your favicon in the public folder
+    icon: "/favico.png", // Path to your favicon in the public folder
   },
 };
 
