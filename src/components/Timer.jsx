@@ -2,7 +2,7 @@ import React from "react";
 
 const Timer = ({ showInfoPopup, setShowInfoPopup, onInfoClick }) => {
   const infoMessage = `**ENTER NAME**, then
-  
+
 **FOR JOIN ROOM:** Lobby needs to have 2 players before the game can be started (It's for 2 players). You can share this link with your friend so he can join the lobby.
 
 Compete in real-time. The first one to cross the finish line wins the race. Follow the race track carefully.
@@ -38,7 +38,7 @@ If you go off the track, your car will fall, and you'll have to start over from 
       </div>
 
       {showInfoPopup && (
-        <div className="fixed inset-0 flex items-center justify-center text-center bg-black bg-opacity-50 leading-[4.8vw] z-[100]">
+        <div className="fixed inset-0 flex items-center justify-center text-center bg-black bg-opacity-50 leading-[4.8vw] sm:leading-none z-[100]">
           <div className="bg-white p-6 rounded-lg text-black max-w-md">
             <h2 className="text-xl font-bold mb-2">Game Information</h2>
             <p className="whitespace-pre-line">{formatMessage(infoMessage)}</p>
