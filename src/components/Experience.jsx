@@ -490,11 +490,11 @@ const Experience = () => {
 
       {/* Mobile Controls Container */}
       {isGameStarted && (
-        <div className="fixed bottom-12 left-0 right-0 flex justify-between px-5 z-[1000] sm:hidden">
+        <div className="fixed bottom-12 left-0 right-0 flex justify-between px-5 z-[1000] sm:hidden no-select">
           {/* Left/Right Arrow Controls */}
           <div className="flex gap-8">
             <button
-              className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
+              className={`arrow-btn w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
                 players.length !== 2
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
@@ -518,7 +518,7 @@ const Experience = () => {
               ←
             </button>
             <button
-              className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
+              className={`arrow-btn w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
                 players.length !== 2
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"

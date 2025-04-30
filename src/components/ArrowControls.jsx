@@ -2,9 +2,9 @@ import React from "react";
 
 const ArrowControls = ({ onLeft, onRight, disabled, isPlayer1 }) => {
   return (
-    <div className="fixed bottom-5 left-5 flex gap-4 z-[1000] sm:hidden">
+    <div className="fixed bottom-5 left-5 flex gap-4 z-[1000] sm:hidden no-select">
       <button
-        className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
+        className={`arrow-btn w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
           disabled
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
@@ -18,7 +18,7 @@ const ArrowControls = ({ onLeft, onRight, disabled, isPlayer1 }) => {
         ←
       </button>
       <button
-        className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
+        className={`arrow-btn w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
           disabled
             ? "bg-gray-400 cursor-not-allowed"
             : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
