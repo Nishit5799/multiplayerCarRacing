@@ -16,7 +16,6 @@ import Background from "./Background";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import Timer from "./Timer";
-import ArrowControls from "./ArrowControls";
 
 const keyboardMap = [
   {
@@ -44,12 +43,7 @@ const keyboardMap = [
 const Experience = () => {
   const socket = useSocket();
   const shadowCameraRef = useRef();
-  const [controls, setControls] = useState({
-    left: 0,
-    right: 0,
-    accelerate: 0,
-    brake: 0,
-  });
+  const [joystickInput, setJoystickInput] = useState({ x: 0, y: 0 });
 
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
@@ -62,12 +56,13 @@ const Experience = () => {
   const [countdown, setCountdown] = useState(null);
   const [hasJoinedRoom, setHasJoinedRoom] = useState(false);
   const [shouldReload, setShouldReload] = useState(false);
+
   const [winner, setWinner] = useState(null);
   const [loser, setLoser] = useState(null);
   const [playerLeft, setPlayerLeft] = useState(false);
   const [isUsernameValid, setIsUsernameValid] = useState(true);
   const [restartCountdown, setRestartCountdown] = useState(null);
-  const [practiceLink] = useState("https://race-car-timing.vercel.app/");
+  const [practiceLink] = useState("https://race-car-timing.vercel.app/"); // Replace with your actual practice mode URL
 
   const carControllerRef1 = useRef();
   const carControllerRef2 = useRef();
@@ -212,6 +207,7 @@ const Experience = () => {
       socket.on("updatePlayers", (players) => {
         console.log("Received updatePlayers event:", players);
 
+        // Check if current player is in position 2 or higher
         if (players.length > 2) {
           const currentPlayerIndex = players.findIndex(
             (p) => p.id === socket.id
@@ -223,7 +219,7 @@ const Experience = () => {
               }, reloading...`
             );
             setShouldReload(true);
-            return;
+            return; // Don't update state since we're reloading
           }
         }
 
@@ -342,14 +338,8 @@ const Experience = () => {
               <>
                 <CarController
                   ref={carControllerRef1}
-                  controls={
-                    players[0]?.id === socket.id
-                      ? {
-                          steering: controls.right - controls.left,
-                          acceleration: controls.accelerate,
-                          brake: controls.brake,
-                        }
-                      : null
+                  joystickInput={
+                    players[0]?.id === socket.id ? joystickInput : null
                   }
                   onRaceEnd={handleRaceEnd}
                   disabled={!isGameStarted}
@@ -359,14 +349,8 @@ const Experience = () => {
                 />
                 <CarController
                   ref={carControllerRef2}
-                  controls={
-                    players[1]?.id === socket.id
-                      ? {
-                          steering: controls.right - controls.left,
-                          acceleration: controls.accelerate,
-                          brake: controls.brake,
-                        }
-                      : null
+                  joystickInput={
+                    players[1]?.id === socket.id ? joystickInput : null
                   }
                   onRaceEnd={handleRaceEnd}
                   disabled={!isGameStarted}
@@ -458,7 +442,7 @@ const Experience = () => {
       )}
 
       {hasJoinedRoom && !isGameStarted && (
-        <div className="fixed bottom-5 right-5 bg-black bg-opacity-50 text-white p-4 rounded-lg z-[101]">
+        <div className="fixed bottom-5 right-5 bg-black bg-opacity-50 text-white p-4 rounded-lg z-[100]">
           <h3>Lobby</h3>
           {players.map((player, index) => (
             <div key={index}>
@@ -503,65 +487,11 @@ const Experience = () => {
         </div>
       )}
 
-      {isGameStarted && (
-        <div className="fixed bottom-12 left-0 right-0 flex justify-between px-5 z-[1000] sm:hidden no-select">
-          <div className="flex gap-8">
-            <button
-              className={`arrow-btn w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
-                players.length !== 2
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
-              }`}
-              onPointerDown={() => {
-                if (players.length === 2) {
-                  setControls((prev) => ({ ...prev, left: 1 }));
-                }
-              }}
-              onPointerUp={() => {
-                setControls((prev) => ({ ...prev, left: 0 }));
-              }}
-              onPointerLeave={() => {
-                setControls((prev) => ({ ...prev, left: 0 }));
-              }}
-            >
-              ←
-            </button>
-            <button
-              className={`arrow-btn w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
-                players.length !== 2
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
-              }`}
-              onPointerDown={() => {
-                if (players.length === 2) {
-                  setControls((prev) => ({ ...prev, right: 1 }));
-                }
-              }}
-              onPointerUp={() => {
-                setControls((prev) => ({ ...prev, right: 0 }));
-              }}
-              onPointerLeave={() => {
-                setControls((prev) => ({ ...prev, right: 0 }));
-              }}
-            >
-              →
-            </button>
-          </div>
-
-          <Joystick
-            onMove={(input) => {
-              setControls((prev) => ({
-                ...prev,
-                accelerate: input.y > 0 ? input.y : 0,
-                brake: input.y < 0 ? -input.y : 0,
-              }));
-            }}
-            onStart={() => {}}
-            disabled={players.length !== 2}
-          />
-        </div>
-      )}
-
+      <Joystick
+        onMove={setJoystickInput}
+        onStart={() => {}}
+        disabled={!isGameStarted || players.length !== 2}
+      />
       <Timer
         onReset={handleReset}
         showPopup={showPopup}

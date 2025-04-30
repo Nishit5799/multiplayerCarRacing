@@ -25,17 +25,3 @@
     background-position: calc(100% / 3) 0, calc(100% / -3) 100%;
   }
 }
-
-/* Prevent text selection on arrow buttons */
-.no-select,
-.arrow-btn {
-  user-select: none;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-}
-
-/* Optional: Add this if you want to prevent highlighting on mobile */
-.arrow-btn:active {
-  -webkit-tap-highlight-color: transparent;
-}

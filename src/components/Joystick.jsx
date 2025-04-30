@@ -27,19 +27,23 @@ const Joystick = ({ onMove, onStart = () => {}, disabled }) => {
         (t) => t.identifier === touchIdRef.current
       );
       if (touch) {
+        const deltaX = touch.clientX - centerRef.current.x;
         const deltaY = touch.clientY - centerRef.current.y;
-        const distance = Math.abs(deltaY);
-        const maxDistance = joystickRef.current.offsetHeight / 2;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const maxDistance = joystickRef.current.offsetWidth / 2;
 
+        const angle = Math.atan2(deltaY, deltaX);
         const force = Math.min(distance / maxDistance, 1);
-        const thumbstickY = (deltaY / distance) * force * maxDistance;
 
-        setThumbstickPosition({ x: 0, y: thumbstickY });
+        const thumbstickX = Math.cos(angle) * force * maxDistance;
+        const thumbstickY = Math.sin(angle) * force * maxDistance;
 
-        // Only send y-axis movement (forward/backward)
+        setThumbstickPosition({ x: thumbstickX, y: thumbstickY });
+
+        const isBackward = deltaY > 0;
         onMove({
-          x: 0,
-          y: deltaY < 0 ? -force : force,
+          x: isBackward ? -Math.cos(angle) * force : -Math.cos(angle) * force,
+          y: Math.sin(angle) * force,
         });
 
         if (deltaY < 0) {
@@ -73,13 +77,13 @@ const Joystick = ({ onMove, onStart = () => {}, disabled }) => {
   return (
     <div
       ref={joystickRef}
-      className="fixed bottom-10 right-5 w-14 h-28 rounded-full bg-white bg-opacity-50 touch-none flex items-center justify-center sm:block md:hidden select-none user-select-none"
+      className="fixed bottom-5 right-5 w-32 h-32 rounded-full bg-white bg-opacity-50 touch-none flex items-center justify-center sm:block md:hidden select-none user-select-none"
     >
       <div
         ref={thumbstickRef}
         className="w-12 h-12 rounded-full bg-black bg-opacity-50 select-none user-select-none transform transition-transform duration-100 ease-out"
         style={{
-          transform: `translate(0px, ${thumbstickPosition.y}px)`,
+          transform: `translate(${thumbstickPosition.x}px, ${thumbstickPosition.y}px)`,
         }}
       ></div>
     </div>
