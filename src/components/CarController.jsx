@@ -1,4 +1,3 @@
-// src/components/CarController.jsx
 import React, {
   useEffect,
   useRef,
@@ -15,7 +14,7 @@ import { MathUtils } from "three/src/math/MathUtils";
 import { useSocket } from "../context/SocketContext";
 
 const CarController = forwardRef(
-  ({ joystickInput, onRaceEnd, position, isPlayer1, color }, ref) => {
+  ({ controls, onRaceEnd, position, isPlayer1, color }, ref) => {
     const socket = useSocket();
     const [isSmallScreen, setIsSmallScreen] = useState(window.innerWidth < 640);
     const [isBraking, setIsBraking] = useState(false);
@@ -179,10 +178,11 @@ const CarController = forwardRef(
 
         let targetSpeed = 0;
 
-        const { forward, backward, left, right, run } = get();
+        const { forward, backward, run } = get();
+
+        // Handle keyboard controls
         if (forward) {
           targetSpeed = run ? RUN_SPEED : WALK_SPEED;
-
           setIsBraking(false);
           setIsReversing(false);
           setIsMovingForward(true);
@@ -200,13 +200,14 @@ const CarController = forwardRef(
           setIsMovingForward(false);
         }
 
-        if (joystickInput) {
-          if (joystickInput.y < 0) {
-            targetSpeed = WALK_SPEED;
+        // Handle mobile controls
+        if (controls) {
+          if (controls.accelerate > 0) {
+            targetSpeed = WALK_SPEED * controls.accelerate;
             setIsBraking(false);
             setIsReversing(false);
             setIsMovingForward(true);
-          } else if (joystickInput.y > 0) {
+          } else if (controls.brake > 0) {
             if (currentSpeed.current > 0) {
               targetSpeed = 0;
             } else {
@@ -215,7 +216,10 @@ const CarController = forwardRef(
             setIsReversing(true);
             setIsMovingForward(false);
           }
-          rotationTarget.current += ROTATION_SPEED * joystickInput.x;
+
+          if (controls.steering !== 0) {
+            rotationTarget.current += ROTATION_SPEED * controls.steering;
+          }
         }
 
         if (currentSpeed.current < targetSpeed) {
@@ -230,18 +234,7 @@ const CarController = forwardRef(
 
         setIsBraking(currentSpeed.current < 0);
 
-        if (left) {
-          movement.x = 1;
-        }
-        if (right) {
-          movement.x = -1;
-        }
-
-        if (movement.x !== 0) {
-          rotationTarget.current += ROTATION_SPEED * movement.x;
-        }
-
-        if (movement.x !== 0 || movement.z !== 0) {
+        if (movement.z !== 0) {
           vel.x =
             Math.sin(rotationTarget.current) *
             Math.abs(currentSpeed.current) *
@@ -314,7 +307,7 @@ const CarController = forwardRef(
         gravityScale={9}
         onIntersectionEnter={({ other }) => {
           if (other.rigidBodyObject.name === "raceEnd") {
-            onRaceEnd(isPlayer1); // Pass isPlayer1 to onRaceEnd
+            onRaceEnd(isPlayer1);
           } else if (other.rigidBodyObject.name === "space") {
             respawn();
           }
