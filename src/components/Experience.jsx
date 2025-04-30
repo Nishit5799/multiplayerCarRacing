@@ -16,6 +16,7 @@ import Background from "./Background";
 import gsap from "gsap";
 import { useSocket } from "../context/SocketContext";
 import Timer from "./Timer";
+import ArrowControls from "./ArrowControls";
 
 const keyboardMap = [
   {
@@ -442,7 +443,7 @@ const Experience = () => {
       )}
 
       {hasJoinedRoom && !isGameStarted && (
-        <div className="fixed bottom-5 right-5 bg-black bg-opacity-50 text-white p-4 rounded-lg z-[100]">
+        <div className="fixed bottom-5 right-5 bg-black bg-opacity-50 text-white p-4 rounded-lg z-[101]">
           <h3>Lobby</h3>
           {players.map((player, index) => (
             <div key={index}>
@@ -487,11 +488,70 @@ const Experience = () => {
         </div>
       )}
 
-      <Joystick
-        onMove={setJoystickInput}
-        onStart={() => {}}
-        disabled={!isGameStarted || players.length !== 2}
-      />
+      {/* Mobile Controls Container */}
+      {isGameStarted && (
+        <div className="fixed bottom-12 left-0 right-0 flex justify-between px-5 z-[1000] sm:hidden">
+          {/* Left/Right Arrow Controls */}
+          <div className="flex gap-8">
+            <button
+              className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
+                players.length !== 2
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
+              }`}
+              onPointerDown={() => {
+                if (players.length === 2) {
+                  if (players[0]?.id === socket.id) {
+                    setJoystickInput((prev) => ({ ...prev, x: 1 }));
+                  } else if (players[1]?.id === socket.id) {
+                    setJoystickInput((prev) => ({ ...prev, x: 1 }));
+                  }
+                }
+              }}
+              onPointerUp={() => {
+                setJoystickInput((prev) => ({ ...prev, x: 0 }));
+              }}
+              onPointerLeave={() => {
+                setJoystickInput((prev) => ({ ...prev, x: 0 }));
+              }}
+            >
+              ←
+            </button>
+            <button
+              className={`w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-bold ${
+                players.length !== 2
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-white bg-opacity-50 active:bg-gray-600 active:text-white"
+              }`}
+              onPointerDown={() => {
+                if (players.length === 2) {
+                  if (players[0]?.id === socket.id) {
+                    setJoystickInput((prev) => ({ ...prev, x: -1 }));
+                  } else if (players[1]?.id === socket.id) {
+                    setJoystickInput((prev) => ({ ...prev, x: -1 }));
+                  }
+                }
+              }}
+              onPointerUp={() => {
+                setJoystickInput((prev) => ({ ...prev, x: 0 }));
+              }}
+              onPointerLeave={() => {
+                setJoystickInput((prev) => ({ ...prev, x: 0 }));
+              }}
+            >
+              →
+            </button>
+          </div>
+
+          {/* Joystick */}
+          <Joystick
+            onMove={setJoystickInput}
+            onStart={() => {}}
+            disabled={players.length !== 2}
+          />
+        </div>
+      )}
+
       <Timer
         onReset={handleReset}
         showPopup={showPopup}
