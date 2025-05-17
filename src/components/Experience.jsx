@@ -385,7 +385,7 @@ const Experience = () => {
               ref={welcomeTextRef}
               className="font-choco tracking-wider text-5xl font-bold text-yellow-400 mb-8 flex"
             >
-              {"Welcome to Nishkart".split("").map((letter, index) => (
+              {"Welcome to Nishgear".split("").map((letter, index) => (
                 <span key={index} className="inline-block">
                   {letter === " " ? "\u00A0" : letter}
                 </span>
