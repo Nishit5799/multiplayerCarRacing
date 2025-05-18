@@ -14,7 +14,7 @@ const geistMono = localFont({
 });
 
 export const metadata = {
-  title: "NISHKART | RACE BEGINS",
+  title: "NISHGEAR | RACE BEGINS",
   description: "Complete the race before your opponent",
   icons: {
     icon: "/favico.png", // Path to your favicon in the public folder
